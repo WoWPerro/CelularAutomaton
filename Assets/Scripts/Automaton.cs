@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class Automaton : MonoBehaviour
 {
+	public bool stepped = false;
 	public bool Black = false;
 	public bool random = false;
 	public GameObject white;
@@ -15,18 +16,85 @@ public class Automaton : MonoBehaviour
 	bool[] rules;
 	bool[,] map;
 	private Dictionary<string, bool> param;
-	// Start is called before the first frame update
-	void Start()
+	public List<GameObject> objs;
+
+    void Start()
+    {
+		objs = new List<GameObject>();
+	}
+
+    public void SetVariables(bool _stepped, bool _random, int _X, int _Y, int _type)
+    {
+		
+		Clean();
+		stepped = _stepped;
+		random = _random;
+		SizeX = _X;
+		SizeY = _Y;
+		type = _type;
+		GenerateBoard();
+    }
+
+	public void GenerateBoard()
+    {
+        RuleSetUp();
+        BoardSetUp();
+        FillBoard();
+		if(stepped)
+        {
+			StartCoroutine(CreateTile());
+		}
+		else
+        {
+			CreateAllTiles();
+		}
+        
+    }
+
+    private void FillBoard()
+    {
+        for (int i = 0; i < SizeX; i++)
+        {
+            for (int j = 1; j < SizeY; j++)
+            {
+                CheckUp(i, j);
+            }
+        }
+    }
+
+    private void BoardSetUp()
+    {
+        if (random)
+        {
+            for (int i = 0; i < SizeX; i++)
+            {
+                if (UnityEngine.Random.Range(0f, 1f) > .5f)
+                {
+                    map[i, 0] = true;
+                }
+            }
+        }
+        else
+        {
+            for (int i = 0; i < SizeX; i++)
+            {
+                map[i, 0] = false;
+            }
+            map[SizeX / 2, 0] = true;
+        }
+    }
+
+    void RuleSetUp()
     {
 		binary = Convert.ToString(type, 2);
-		while(binary.Length < 8)
+		while (binary.Length < 8)
 		{
 			binary = "0" + binary;
 		}
 		rules = new bool[8];
 		for (int i = 0; i < binary.Length; i++)
 		{
-			if(binary[i] == '1')
+			if (binary[i] == '1')
 			{
 				rules[i] = true;
 			}
@@ -45,37 +113,7 @@ public class Automaton : MonoBehaviour
 		param.Add("001", rules[6]);
 		param.Add("000", rules[7]);
 
-		map = new bool[SizeX,SizeY];
-		
-		if(random)
-		{
-			for (int i = 0; i < SizeX; i++)
-			{
-				if (UnityEngine.Random.Range(0f, 1f) > .5f)
-				{
-					map[i, 0] = true;
-				}
-			}
-		}
-		else
-		{
-			for (int i = 0; i < SizeX; i++)
-			{
-				map[i, 0] = false;
-			}
-			map[SizeX / 2, 0] = true;
-		}
-		
-
-
-		for (int i = 0; i < SizeX; i++)
-		{
-			for (int j = 1; j < SizeY; j++)
-			{
-				CheckUp(i, j);
-			}
-		}
-		StartCoroutine(CreateTile());
+		map = new bool[SizeX, SizeY];
 	}
 
 	void CheckUp(int x, int y)
@@ -153,6 +191,7 @@ public class Automaton : MonoBehaviour
 			{
 			
 				GameObject g = Instantiate(white, new Vector2(i, -j), Quaternion.identity);
+				objs.Add(g);
 				g.SetActive(true);
 				if (!map[i, j])
 				{
@@ -171,6 +210,40 @@ public class Automaton : MonoBehaviour
 		}
 		StopCoroutine(CreateTile());
 	}
+
+	void CreateAllTiles()
+    {
+		for (int j = 0; j < SizeY; j++)
+		{
+			for (int i = 0; i < SizeX; i++)
+			{
+
+				GameObject g = Instantiate(white, new Vector2(i, -j), Quaternion.identity);
+				g.SetActive(true);
+				if (!map[i, j])
+				{
+					if (!Black)
+					{
+						g.GetComponent<SpriteRenderer>().color = Color.Lerp(Color.red, Color.blue, (SizeY + SizeX) / (SizeY + SizeX));
+					}
+					else
+					{
+						g.GetComponent<SpriteRenderer>().color = Color.black;
+					}
+				}
+
+			}
+		}
+	}
+
+	void Clean()
+    {
+		for(int i = 0; i < objs.Count; i++)
+        {
+			Destroy(objs[i]);
+        }
+		objs.Clear();
+    }
 
     // Update is called once per frame
     void Update()

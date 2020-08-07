@@ -1,24 +1,24 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
-	public GameObject CelularAutomata;
-    // Start is called before the first frame update
+    public Button start;
+    public InputField X;
+    public InputField Y;
+    public InputField rule;
+    public Toggle random;
+    public Toggle step;
+
     void Start()
     {
-        
+        start.onClick.AddListener(GenerateTile);
     }
 
-    // Update is called once per frame
-    void Update()
+    void GenerateTile()
     {
-        
+        GetComponent<Automaton>().SetVariables(step.isOn, random.isOn, int.Parse(X.text), int.Parse(Y.text), int.Parse(rule.text));
     }
-
-	void CreateBoard(int sizeX, int sizeY, int Model, bool Aleatorio)
-	{
-
-	}
 }
