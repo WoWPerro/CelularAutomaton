@@ -25,7 +25,6 @@ public class Automaton : MonoBehaviour
 
     public void SetVariables(bool _stepped, bool _random, int _X, int _Y, int _type)
     {
-		
 		Clean();
 		stepped = _stepped;
 		random = _random;
@@ -53,10 +52,10 @@ public class Automaton : MonoBehaviour
 
     private void FillBoard()
     {
-        for (int i = 0; i < SizeX; i++)
-        {
-            for (int j = 1; j < SizeY; j++)
-            {
+		for (int j = 1; j < SizeY; j++)
+		{
+			for (int i = 0; i < SizeX; i++)
+			{
                 CheckUp(i, j);
             }
         }
@@ -120,7 +119,29 @@ public class Automaton : MonoBehaviour
 	{
 		string number = "";
 
-		if(map[x, y - 1] == true)
+		if (x > 0)
+		{
+			if (map[x - 1, y - 1] == true)
+			{
+				number += "1";
+			}
+			else
+			{
+				number += "0";
+			}
+		}
+		else
+		{
+			if (map[SizeX - 1, y - 1] == true)
+			{
+				number += "1";
+			}
+			else
+			{
+				number += "0";
+			}
+		}
+		if (map[x, y - 1] == true)
 		{
 			number += "1";
 		}
@@ -150,28 +171,7 @@ public class Automaton : MonoBehaviour
 				number += "0";
 			}
 		}
-		if(x > 0)
-		{
-			if (map[x - 1, y - 1] == true)
-			{
-				number += "1";
-			}
-			else
-			{
-				number += "0";
-			}
-		}
-		else
-		{
-			if (map[SizeX - 1, y - 1] == true)
-			{
-				number += "1";
-			}
-			else
-			{
-				number += "0";
-			}
-		}
+	
 
 		if(param[number])
 		{
